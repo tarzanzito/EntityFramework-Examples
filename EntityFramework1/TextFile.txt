@@ -1,0 +1,117 @@
+﻿{
+  "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "traceId": "00-e2ba8546efb4204ca13db8ac76f35624-ca7108fc2ff4cd48-00",
+  "errors": {
+    "$": [
+      "The JSON object contains a trailing comma at the end which is not supported in this mode. Change the reader options. Path: $ | LineNumber: 5 | BytePositionInLine: 0."
+    ]
+  }
+}
+
+-------------------------------------------
+SET NOCOUNT ON;
+
+INSERT INTO [Student] ([EnrollmentDate], [FirstMidName], [LastName])
+VALUES (@p0, @p1, @p2);
+
+SELECT [StudentID]
+FROM [Student]
+WHERE @@ROWCOUNT = 1 AND [StudentID] = scope_identity();
+
+
+https://docs.microsoft.com/en-us/sql/t-sql/functions/rowcount-transact-sql?view=sql-server-ver15
+https://docs.microsoft.com/en-us/sql/t-sql/functions/scope-identity-transact-sql?view=sql-server-ver15
+https://docs.microsoft.com/en-us/sql/t-sql/statements/set-nocount-transact-sql?view=sql-server-ver15
+
+
+
+
+
+CREATE TABLE [dbo].[Customers] (
+    [CustomerID] INT            IDENTITY (1, 1) NOT NULL,
+    [FirstName]  NVARCHAR (MAX) NULL,
+    [LastName]   NVARCHAR (MAX) NULL,
+    [Email]      NVARCHAR (MAX) NULL,
+    CONSTRAINT [PK_dbo.Customers] PRIMARY KEY CLUSTERED ([CustomerID] ASC)
+);
+
+
+public class Customer
+{
+    public int CustomerID { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+}
+
+// GET: Customer
+public ActionResult Index()
+{
+    List<Customer> customers = new List<Customer>();
+    using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["CustomerConnection"].ConnectionString))
+    {
+
+        customers = db.Query<Customer>("Select * From Customers").ToList();
+    }
+    return View(customers);
+}
+
+
+public class Program
+{
+	public class OrderDetail
+	{
+		public int OrderDetailID { get; set; }
+		public int OrderID { get; set; }
+		public int ProductID { get; set; }
+		public int Quantity { get; set; }
+	}
+	
+	public class Order
+	{
+		public int OrderID { get; set; }
+		public int CustomerID { get; set; }
+		public int EmployeeID { get; set; }
+		public DateTime OrderDate  { get; set; }
+		public int ShipperID  { get; set; }
+		public List<OrderDetail> OrderDetails { get; set; }
+	}
+	
+	public static void Main()
+	{
+		string sql = "SELECT TOP 10 * FROM Orders AS A INNER JOIN OrderDetails AS B ON A.OrderID = B.OrderID;";
+
+		using (var connection = new SqlConnection(FiddleHelper.GetConnectionStringSqlServerW3Schools()))
+		{			
+			var orderDictionary = new Dictionary<int, Order>();
+			
+			
+			var list = connection.Query<Order, OrderDetail, Order>(
+            	sql,
+            	(order, orderDetail) =>
+            	{
+                	Order orderEntry;
+                
+                	if (!orderDictionary.TryGetValue(order.OrderID, out orderEntry))
+                	{
+                    	orderEntry = order;
+                    	orderEntry.OrderDetails = new List<OrderDetail>();
+                    	orderDictionary.Add(orderEntry.OrderID, orderEntry);
+                	}
+
+                	orderEntry.OrderDetails.Add(orderDetail);
+                	return orderEntry;
+            	},
+            	splitOn: "OrderDetailID")
+        	.Distinct()
+        	.ToList();
+
+    		Console.WriteLine("Orders Count:" + list.Count);
+			
+			FiddleHelper.WriteTable(list);
+			FiddleHelper.WriteTable(list.First().OrderDetails);
+		}
+	}
+}

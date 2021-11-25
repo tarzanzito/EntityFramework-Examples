@@ -1,0 +1,4 @@
+﻿Open "nuget package manager console"
+
+Add-Migration InitialCreate
+Update-Database

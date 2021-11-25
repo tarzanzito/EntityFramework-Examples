@@ -1,0 +1,19 @@
+﻿
+
+//https://www.michalbialecki.com/2020/09/09/working-with-views-in-entity-framework-core-5/
+
+//https://www.youtube.com/watch?v=SSwuwIzQZvE
+
+// https://entityframeworkcore.com/providers-sql-server
+
+// log to console sql statement
+//http://www.macoratti.net/18/07/efcore_logcons1.htm
+
+//https://www.youtube.com/watch?v=ZjAG465lpcA
+//https://www.youtube.com/watch?v=s_ihuUjnsec
+
+//fromSqlRaw
+//https://www.youtube.com/watch?v=S9eEB_8XZmY
+
+//sql injecton
+//https://www.youtube.com/watch?v=oG5B_KvVByA
